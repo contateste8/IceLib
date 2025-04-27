@@ -1,0 +1,181 @@
+--// JuliHub Library
+
+local JuliHub = {}
+JuliHub.__index = JuliHub
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+function JuliHub:CreateWindow(options)
+    options = options or {}
+    local WindowTitle = options.Title or "JuliHub - Brookhaven"
+    local Version = options.Version or "v5.0"
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "JuliHub_UI"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = game:GetService("CoreGui")
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = UDim2.new(0, 450, 0, 300)
+    MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+
+    local TopBar = Instance.new("TextLabel")
+    TopBar.Name = "TopBar"
+    TopBar.Size = UDim2.new(1, 0, 0, 30)
+    TopBar.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    TopBar.BorderSizePixel = 0
+    TopBar.Text = WindowTitle
+    TopBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+    TopBar.Font = Enum.Font.GothamBold
+    TopBar.TextSize = 14
+    TopBar.Parent = MainFrame
+
+    local SettingsIcon = Instance.new("ImageButton")
+    SettingsIcon.Name = "SettingsIcon"
+    SettingsIcon.Size = UDim2.new(0, 20, 0, 20)
+    SettingsIcon.Position = UDim2.new(0, 5, 1, -25)
+    SettingsIcon.BackgroundTransparency = 1
+    SettingsIcon.Image = "rbxassetid://6034509993"
+    SettingsIcon.ImageColor3 = Color3.fromRGB(150, 150, 150)
+    SettingsIcon.Parent = MainFrame
+
+    local VersionLabel = Instance.new("TextLabel")
+    VersionLabel.Name = "VersionLabel"
+    VersionLabel.Size = UDim2.new(0, 50, 0, 20)
+    VersionLabel.Position = UDim2.new(0, 30, 1, -25)
+    VersionLabel.BackgroundTransparency = 1
+    VersionLabel.Text = Version
+    VersionLabel.TextColor3 = Color3.fromRGB(150, 150, 150)
+    VersionLabel.Font = Enum.Font.Gotham
+    VersionLabel.TextSize = 12
+    VersionLabel.TextXAlignment = Enum.TextXAlignment.Left
+    VersionLabel.Parent = MainFrame
+
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Name = "Sidebar"
+    Sidebar.Size = UDim2.new(0, 100, 1, -30)
+    Sidebar.Position = UDim2.new(0, 0, 0, 30)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    Sidebar.BorderSizePixel = 0
+    Sidebar.Parent = MainFrame
+
+    local SidebarList = Instance.new("UIListLayout")
+    SidebarList.SortOrder = Enum.SortOrder.LayoutOrder
+    SidebarList.Padding = UDim.new(0, 5)
+    SidebarList.Parent = Sidebar
+
+    local TabFolder = Instance.new("Folder")
+    TabFolder.Name = "Tabs"
+    TabFolder.Parent = MainFrame
+
+    local Tabs = {}
+
+    function JuliHub:CreateTab(name)
+        local Button = Instance.new("TextButton")
+        Button.Name = name.."TabButton"
+        Button.Size = UDim2.new(1, 0, 0, 40)
+        Button.BackgroundTransparency = 1
+        Button.Text = name
+        Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+        Button.Font = Enum.Font.Gotham
+        Button.TextSize = 14
+        Button.Parent = Sidebar
+
+        local TabFrame = Instance.new("Frame")
+        TabFrame.Name = name.."Tab"
+        TabFrame.Size = UDim2.new(1, -100, 1, -30)
+        TabFrame.Position = UDim2.new(0, 100, 0, 30)
+        TabFrame.BackgroundTransparency = 1
+        TabFrame.Visible = false
+        TabFrame.Parent = TabFolder
+
+        local UIListLayout = Instance.new("UIListLayout")
+        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        UIListLayout.Padding = UDim.new(0, 6)
+        UIListLayout.Parent = TabFrame
+
+        Button.MouseButton1Click:Connect(function()
+            for _, tab in pairs(TabFolder:GetChildren()) do
+                tab.Visible = false
+            end
+            TabFrame.Visible = true
+        end)
+
+        local Tab = {}
+
+        function Tab:AddToggle(text, callback)
+            local ToggleFrame = Instance.new("Frame")
+            ToggleFrame.Name = text.."ToggleFrame"
+            ToggleFrame.Size = UDim2.new(1, -10, 0, 30)
+            ToggleFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            ToggleFrame.BorderSizePixel = 0
+            ToggleFrame.Parent = TabFrame
+
+            local ToggleButton = Instance.new("TextButton")
+            ToggleButton.Name = text.."ToggleButton"
+            ToggleButton.Size = UDim2.new(1, 0, 1, 0)
+            ToggleButton.BackgroundTransparency = 1
+            ToggleButton.Text = text
+            ToggleButton.TextColor3 = Color3.fromRGB(200, 200, 200)
+            ToggleButton.Font = Enum.Font.Gotham
+            ToggleButton.TextSize = 14
+            ToggleButton.Parent = ToggleFrame
+
+            local toggled = false
+
+            ToggleButton.MouseButton1Click:Connect(function()
+                toggled = not toggled
+                pcall(callback, toggled)
+            end)
+        end
+
+        function Tab:AddButton(text, callback)
+            local ButtonFrame = Instance.new("Frame")
+            ButtonFrame.Name = text.."ButtonFrame"
+            ButtonFrame.Size = UDim2.new(1, -10, 0, 30)
+            ButtonFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            ButtonFrame.BorderSizePixel = 0
+            ButtonFrame.Parent = TabFrame
+
+            local Button = Instance.new("TextButton")
+            Button.Name = text.."Button"
+            Button.Size = UDim2.new(1, 0, 1, 0)
+            Button.BackgroundTransparency = 1
+            Button.Text = text
+            Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+            Button.Font = Enum.Font.Gotham
+            Button.TextSize = 14
+            Button.Parent = ButtonFrame
+
+            Button.MouseButton1Click:Connect(function()
+                pcall(callback)
+            end)
+        end
+
+        function Tab:AddLabel(text)
+            local Label = Instance.new("TextLabel")
+            Label.Name = text.."Label"
+            Label.Size = UDim2.new(1, -10, 0, 30)
+            Label.BackgroundTransparency = 1
+            Label.Text = text
+            Label.TextColor3 = Color3.fromRGB(0, 255, 255)
+            Label.Font = Enum.Font.Gotham
+            Label.TextSize = 14
+            Label.Parent = TabFrame
+        end
+
+        table.insert(Tabs, Tab)
+        return Tab
+    end
+
+    return self
+end
+
+return JuliHub
